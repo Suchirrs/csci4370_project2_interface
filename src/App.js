@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 
 function App() {
-  const [data, setData] = useState([]); // State to hold API results
-  const [loading, setLoading] = useState(false); // State for loading indicator
-  const [queryType, setQueryType] = useState(''); // State to track which query is active
-  const [employee1Name, setEmployee1Name] = useState(''); // State for employee 1's name input
-  const [employee2Name, setEmployee2Name] = useState(''); // State for employee 2's name input
-  const [buttonPressed, setButtonPressed] = useState(false); // State to track if a button has been pressed
+  const [data, setData] = useState([]); 
+  const [loading, setLoading] = useState(false);
+  const [queryType, setQueryType] = useState(''); 
+  const [employee1Name, setEmployee1Name] = useState(''); 
+  const [employee2Name, setEmployee2Name] = useState(''); 
+  const [buttonPressed, setButtonPressed] = useState(false); 
 
   // Function to fetch data for Query1
   const handleQuery1 = async () => {
     setLoading(true);
-    setData([]); // Clear the table
+    setData([]); 
     setQueryType('query1');
-    setButtonPressed(true); // Set button pressed state to true
+    setButtonPressed(true); 
     try {
       const response = await fetch('http://localhost:5000/api/query1');
       const result = await response.json();
@@ -30,7 +30,7 @@ function App() {
     setLoading(true);
     setData([]);
     setQueryType('query2');
-    setButtonPressed(true); // Set button pressed state to true
+    setButtonPressed(true); 
     try {
       const response = await fetch('http://localhost:5000/api/query2');
       const result = await response.json();
@@ -47,7 +47,7 @@ function App() {
     setLoading(true);
     setData([]);
     setQueryType('query3');
-    setButtonPressed(true); // Set button pressed state to true
+    setButtonPressed(true); 
     try {
       const response = await fetch('http://localhost:5000/api/query3');
       const result = await response.json();
@@ -64,7 +64,7 @@ function App() {
     setLoading(true);
     setData([]);
     setQueryType('query4');
-    setButtonPressed(true); // Set button pressed state to true
+    setButtonPressed(true); 
     try {
       const response = await fetch('http://localhost:5000/api/query4');
       const result = await response.json();
@@ -86,7 +86,7 @@ function App() {
     setLoading(true);
     setData([]);
     setQueryType('query5');
-    setButtonPressed(true); // Set button pressed state to true
+    setButtonPressed(true);
     try {
       const response = await fetch(
         `http://localhost:5000/api/query5?employee1_name=${employee1Name}&employee2_name=${employee2Name}`
@@ -106,17 +106,38 @@ function App() {
     console.log(data);
   };
 
-  // Function to handle Query6 - placeholder for now
-  const handleQuery6 = async () => {
-    setLoading(true);
-    setData([]);
-    setQueryType('query6');
-    setButtonPressed(true); // Set button pressed state to true
-    setLoading(false);
-    alert('Query6 logic not implemented yet.');
-  };
+  // Function to fetch data for Query6 - Find 2 degrees of separation
+const handleQuery6 = async () => {
+  if (!employee1Name || !employee2Name) {
+    alert('Please enter both employee names.');
+    return;
+  }
 
-  // Function to render table headers based on query type
+  setLoading(true);
+  setData([]); 
+  setQueryType('query6');
+  setButtonPressed(true); 
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/query6?employee1_name=${employee1Name}&employee2_name=${employee2Name}`
+    );
+    const result = await response.json();
+
+    if (result.message) {
+      alert(result.message); // Show message to the user
+    } else {
+      setData(result);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // Dynamic table headers function
   const renderTableHeaders = () => {
     switch (queryType) {
       case 'query1':
@@ -157,12 +178,23 @@ function App() {
             <th>Employee 2 ID</th>
           </tr>
         );
+
+      case 'query6':
+        return (
+          <tr>
+            <th>Employee 1 ID</th>
+            <th>Department 1 ID</th>
+            <th>Employee 3 ID</th>
+            <th>Department 2 ID</th>
+            <th>Employee 2 ID</th>
+          </tr>
+        );
       default:
         return null;
     }
   };
 
-  // Function to render table body based on query type
+  // Dynamic table body function
   const renderTableBody = () => {
     return data.map((row, index) => {
       switch (queryType) {
@@ -201,6 +233,16 @@ function App() {
             <tr key={index}>
               <td>{row.employee1_id}</td>
               <td>{row.department_id}</td>
+              <td>{row.employee2_id}</td>
+            </tr>
+          );
+        case 'query6':
+          return (
+            <tr key={index}>
+              <td>{row.employee1_id}</td>
+              <td>{row.department1_id}</td>
+              <td>{row.employee3_id}</td>
+              <td>{row.department2_id}</td>
               <td>{row.employee2_id}</td>
             </tr>
           );
@@ -265,7 +307,7 @@ function App() {
   );
 }
 
-// CSS-in-JS styles
+
 const styles = {
   container: {
     textAlign: 'center',
